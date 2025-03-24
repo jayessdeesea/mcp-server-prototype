@@ -1,0 +1,82 @@
+# Cline Custom Instructions
+
+We are building a Model Context Protocol (MCP) Server in Java
+
+## Key Documents
+
+- docs/howto-build-mcp-java.md - how to use the official Java MCP Software Development Kit (SDK)
+- docs/api/prompts.md - supported prompts
+- docs/api/resources.md - supported resources
+- docs/api/tools.md - supported tools
+
+## Terminal
+
+Assume your shell is powershell as we are running under microsoft windows
+- Unix commands may not be available so prefer powershell commands over unix commands
+- Many commands return immediately but you don't seem to realize the command is completed
+
+## Logging
+
+- Written code uses java.util.logging.Logger
+- Use log4j2 as the implementation
+- Route logging frameworks (java.util.logging, slf4j, etc.) to the log4j2 implementation
+- all logs should go to stderr
+
+## Implementation
+
+- Use the following design principles KISS, DRY, YAGNI, and SOLID
+- Use DAO (Data Access Object) where appropriate
+- Place code in the user.jakecarr java package
+- do not create wrapper .sh or .bat scripts. Instead implement maven tests and run them instead
+- do not use deprecated features
+- do not use recursion
+- do not span subprocesses in code or tests
+- Mocks are only for tests
+  - When I ask for results from the mcp server, do not provide me the results using other techniques 
+
+## Test
+
+- Add timeouts to the tests so they don't hang forever
+
+## On Demand Tasks
+
+Do not run any of these on demand task until I ask you to.
+
+### On Demand Task: cleanup task
+
+Run the following when I ask you to run the cleanup task
+
+- Remove redundant files (e.g., *.bak, *.class). Don't worry about files identified by .gitignore 
+- Remove duplicate tests
+- Remove unused imports
+- Remove empty directories
+- Verify all the tests have timeouts. Add timeouts if you have to.
+- Build the project and fix any errors
+- Run tests and fix any errors
+
+### On Demand Task: deploy task
+
+Run the following when I ask you to deploy the mcp server
+
+- run the cleanup task
+- build the standalone jar (uber jar)
+- copy the standalone jar to a stage directory for cline to use
+  - ${HOME}/Cline/MCP/prototype-mcp/prototype-mcp.jar
+- update cline's mcp manifest ${HOME}/AppData/Roaming/Code/User/globalStorage/saoudrizwan.claude-dev/settings/cline_mcp_settings.json
+  - Add or update an mcp server called "prototype-mcp" 
+    - command is "java"
+    - args are "-jar" and the path to the jar file in the stage directory
+    - Add or update an env entry
+      - name is "LAST_MODIFIED"
+      - value is the iso 8601 date
+
+### On Demand Task: checkin task
+
+Run the following when I ask you to run the checkin task
+
+- make sure the code builds (mvn clean build)
+- make sure the tests pass (mvn clean test)
+- Generate an appropriate checkin comment
+  - When using git diff, use the "--no-pager" option to avoid the pager, for example "git --no-pager diff"
+- Use the checkin comment to check the code in
+- Push the code 
