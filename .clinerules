@@ -13,7 +13,8 @@ We are building a Model Context Protocol (MCP) Server in Java
 
 Assume your shell is powershell as we are running under microsoft windows
 - Unix commands may not be available so prefer powershell commands over unix commands
-- Many commands return immediately but you don't seem to realize the command is completed
+- You don't seem to realize when commands are completed
+  - Try adding an extra return at the end of every command
 
 ## Logging
 
@@ -33,6 +34,16 @@ Assume your shell is powershell as we are running under microsoft windows
 - do not span subprocesses in code or tests
 - Mocks are only for tests
   - When I ask for results from the mcp server, do not provide me the results using other techniques 
+- Use spring framework
+  - Use spring boot
+  - Do not use the starters in spring boot
+- Classes with main methods go in src/main/java/user/jakecarr/main
+
+## Debugging
+
+- do not set maven's failOnError to false
+- do not set testFailureIgnore to true
+- do not set mvn -Dmaven.compiler.failOnError=false 
 
 ## Test
 

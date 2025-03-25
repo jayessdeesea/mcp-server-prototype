@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mockito;
+import user.jakecarr.util.FileSystemUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -26,13 +27,15 @@ public class FileContentResourceTest {
     Path tempDir;
 
     private FileContentResource resource;
+    private FileSystemUtils fileSystemUtils;
     private Path textFile;
     private Path binaryFile;
     private Path directory;
 
     @BeforeEach
     public void setUp() throws IOException {
-        resource = new FileContentResource();
+        fileSystemUtils = new FileSystemUtils();
+        resource = new FileContentResource(fileSystemUtils);
 
         // Create a text file
         textFile = tempDir.resolve("content-test.txt");

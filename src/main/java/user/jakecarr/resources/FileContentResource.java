@@ -6,6 +6,8 @@ import io.modelcontextprotocol.spec.McpError;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -20,6 +22,34 @@ public class FileContentResource {
     private static final Logger logger = LogManager.getLogger(FileContentResource.class);
     private static final String URI_PREFIX = "file://content/";
     
+    private final FileSystemUtils fileSystemUtils;
+    
+    /**
+     * Constructor for Spring dependency injection.
+     * 
+     * @param fileSystemUtils The FileSystemUtils dependency
+     */
+    public FileContentResource(FileSystemUtils fileSystemUtils) {
+        this.fileSystemUtils = fileSystemUtils;
+        logger.debug("FileContentResource constructed");
+    }
+    
+    /**
+     * Initialization method called by Spring after dependency injection.
+     */
+    @PostConstruct
+    public void initialize() {
+        logger.info("Initializing FileContentResource");
+    }
+    
+    /**
+     * Cleanup method called by Spring before bean destruction.
+     */
+    @PreDestroy
+    public void cleanup() {
+        logger.info("Cleaning up FileContentResource");
+    }
+    
     /**
      * Handle a request for file content.
      * 
@@ -31,7 +61,7 @@ public class FileContentResource {
         logger.debug("Handling file content request for URI: {}", uri);
         
         try {
-            String filePath = FileSystemUtils.extractPathFromUri(uri, URI_PREFIX);
+            String filePath = fileSystemUtils.extractPathFromUri(uri, URI_PREFIX);
             Path path = Paths.get(filePath);
             
             if (!Files.exists(path)) {
@@ -47,12 +77,12 @@ public class FileContentResource {
             String content;
             String mimeType;
             
-            if (FileSystemUtils.isTextFile(filePath)) {
-                content = FileSystemUtils.readTextFile(filePath);
+            if (fileSystemUtils.isTextFile(filePath)) {
+                content = fileSystemUtils.readTextFile(filePath);
                 mimeType = determineMimeType(filePath);
                 logger.debug("Read text file: {}", filePath);
             } else {
-                content = FileSystemUtils.readBinaryFile(filePath);
+                content = fileSystemUtils.readBinaryFile(filePath);
                 mimeType = "application/octet-stream;base64";
                 logger.debug("Read binary file: {}", filePath);
             }

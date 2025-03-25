@@ -1,5 +1,7 @@
 package user.jakecarr.resources;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.modelcontextprotocol.spec.McpError;
 import io.modelcontextprotocol.spec.McpSchema;
 import org.junit.jupiter.api.BeforeEach;
@@ -8,6 +10,7 @@ import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mockito;
 import user.jakecarr.model.FileMetadata;
+import user.jakecarr.util.FileSystemUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -26,12 +29,16 @@ public class FileMetadataResourceTest {
     Path tempDir;
 
     private FileMetadataResource resource;
+    private FileSystemUtils fileSystemUtils;
+    private ObjectMapper objectMapper;
     private Path testFile;
     private Path testDir;
 
     @BeforeEach
     public void setUp() throws IOException {
-        resource = new FileMetadataResource();
+        fileSystemUtils = new FileSystemUtils();
+        objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
+        resource = new FileMetadataResource(fileSystemUtils, objectMapper);
 
         // Create a test file
         testFile = tempDir.resolve("metadata-test.txt");

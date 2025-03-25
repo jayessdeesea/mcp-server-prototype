@@ -16,6 +16,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
+
 /**
  * Utility class for file system operations.
  */
@@ -23,10 +26,26 @@ public class FileSystemUtils {
     private static final Logger logger = LogManager.getLogger(FileSystemUtils.class);
     
     /**
-     * Private constructor to prevent instantiation.
+     * Constructor for Spring dependency injection.
      */
-    private FileSystemUtils() {
-        // Utility class, do not instantiate
+    public FileSystemUtils() {
+        logger.debug("FileSystemUtils constructed");
+    }
+    
+    /**
+     * Initialization method called by Spring after dependency injection.
+     */
+    @PostConstruct
+    public void initialize() {
+        logger.info("Initializing FileSystemUtils");
+    }
+    
+    /**
+     * Cleanup method called by Spring before bean destruction.
+     */
+    @PreDestroy
+    public void cleanup() {
+        logger.info("Cleaning up FileSystemUtils");
     }
     
     /**
@@ -36,7 +55,7 @@ public class FileSystemUtils {
      * @return The file metadata
      * @throws IOException If an I/O error occurs
      */
-    public static FileMetadata getFileMetadata(String filePath) throws IOException {
+    public FileMetadata getFileMetadata(String filePath) throws IOException {
         logger.debug("Getting metadata for file: {}", filePath);
         
         Path path = Paths.get(filePath);
@@ -80,7 +99,7 @@ public class FileSystemUtils {
      * @return A list of file metadata
      * @throws IOException If an I/O error occurs
      */
-    public static List<FileMetadata> listFiles(String directoryPath, boolean recursive) throws IOException {
+    public List<FileMetadata> listFiles(String directoryPath, boolean recursive) throws IOException {
         logger.debug("Listing files in directory: {}, recursive: {}", directoryPath, recursive);
         
         Path path = Paths.get(directoryPath);
@@ -126,7 +145,7 @@ public class FileSystemUtils {
      * @return The file content as a string
      * @throws IOException If an I/O error occurs
      */
-    public static String readTextFile(String filePath) throws IOException {
+    public String readTextFile(String filePath) throws IOException {
         logger.debug("Reading text file: {}", filePath);
         
         Path path = Paths.get(filePath);
@@ -157,7 +176,7 @@ public class FileSystemUtils {
      * @return The file content as a base64-encoded string
      * @throws IOException If an I/O error occurs
      */
-    public static String readBinaryFile(String filePath) throws IOException {
+    public String readBinaryFile(String filePath) throws IOException {
         logger.debug("Reading binary file: {}", filePath);
         
         Path path = Paths.get(filePath);
@@ -190,7 +209,7 @@ public class FileSystemUtils {
      * @return True if the file is likely a text file, false otherwise
      * @throws IOException If an I/O error occurs
      */
-    public static boolean isTextFile(String filePath) throws IOException {
+    public boolean isTextFile(String filePath) throws IOException {
         logger.debug("Checking if file is a text file: {}", filePath);
         
         Path path = Paths.get(filePath);
@@ -237,7 +256,7 @@ public class FileSystemUtils {
      * @param prefix The URI prefix to remove
      * @return The file path
      */
-    public static String extractPathFromUri(String uri, String prefix) {
+    public String extractPathFromUri(String uri, String prefix) {
         if (uri == null || !uri.startsWith(prefix)) {
             throw new IllegalArgumentException("Invalid URI format: " + uri);
         }

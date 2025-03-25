@@ -1,10 +1,12 @@
-# Filesystem MCP Server Resources
+# Filesystem MCP Server Resources (Deprecated)
 
-The Filesystem MCP Server provides resources for accessing file metadata and content from the local filesystem.
+> **Note:** The Filesystem MCP Server now uses tools instead of resources for accessing file metadata and content. Please refer to the [tools documentation](tools.md) for the current implementation.
+
+This document describes the previous resource-based implementation, which is no longer actively used.
 
 ## Resource Types
 
-### 1. File Metadata Resource
+### 1. File Metadata Resource (Deprecated)
 
 The file metadata resource provides information about files and directories in the local filesystem.
 
@@ -44,33 +46,7 @@ The response is a JSON object with the following properties:
 }
 ```
 
-#### Properties
-
-| Property | Type | Description |
-|----------|------|-------------|
-| `name` | String | The name of the file or directory |
-| `path` | String | The full path to the file or directory |
-| `size` | Long | The size of the file in bytes (0 for directories) |
-| `lastModified` | ISO-8601 String | The last modified time of the file or directory |
-| `creationTime` | ISO-8601 String | The creation time of the file or directory |
-| `isDirectory` | Boolean | Whether the path points to a directory |
-| `isRegularFile` | Boolean | Whether the path points to a regular file |
-| `isSymbolicLink` | Boolean | Whether the path points to a symbolic link |
-| `isHidden` | Boolean | Whether the file or directory is hidden |
-| `isReadable` | Boolean | Whether the file or directory is readable |
-| `isWritable` | Boolean | Whether the file or directory is writable |
-| `isExecutable` | Boolean | Whether the file or directory is executable |
-
-#### Error Handling
-
-The resource will return an error in the following cases:
-
-- The file or directory does not exist
-- The path is invalid
-- The file or directory cannot be accessed due to permissions
-- An I/O error occurs while reading the file metadata
-
-### 2. File Content Resource
+### 2. File Content Resource (Deprecated)
 
 The file content resource provides the content of files in the local filesystem.
 
@@ -97,73 +73,14 @@ For text files, the content is returned as a string with the appropriate text MI
 
 For binary files, the content is returned as a base64-encoded string with the MIME type `application/octet-stream;base64`.
 
-#### MIME Type Detection
+## Migration to Tools
 
-The server attempts to detect the MIME type of the file based on its extension:
+The functionality previously provided by resources has been migrated to tools:
 
-| Extension | MIME Type |
-|-----------|-----------|
-| .txt | text/plain |
-| .html, .htm | text/html |
-| .css | text/css |
-| .js | application/javascript |
-| .json | application/json |
-| .xml | application/xml |
-| .md | text/markdown |
-| .csv | text/csv |
-| .java | text/x-java-source |
-| .py | text/x-python |
-| .c, .cpp, .h | text/x-c |
-| Other text files | text/plain |
-| Binary files | application/octet-stream;base64 |
+| Resource | Replacement Tool |
+|----------|------------------|
+| `file://metadata/{path}` | `get_file_metadata` |
+| `file://content/{path}` | `get_file_content` |
+| `file://directory/{path}` | `list_files` |
 
-#### Text vs. Binary Detection
-
-The server uses a simple heuristic to determine if a file is text or binary:
-
-1. It reads the first 8KB of the file
-2. If the file contains null bytes (0x00), it is considered binary
-3. Otherwise, it is considered text
-
-This heuristic works for most common file types but may not be accurate for all files.
-
-#### Error Handling
-
-The resource will return an error in the following cases:
-
-- The file does not exist
-- The path is invalid
-- The file cannot be accessed due to permissions
-- The path points to a directory (cannot read content of directories)
-- An I/O error occurs while reading the file content
-
-## Usage Examples
-
-### Retrieving File Metadata
-
-```java
-ReadResourceRequest request = ReadResourceRequest.builder()
-    .uri("file://metadata/C:/example/file.txt")
-    .build();
-
-ReadResourceResult result = client.readResource(request);
-String metadataJson = result.getContent();
-```
-
-### Retrieving File Content
-
-```java
-ReadResourceRequest request = ReadResourceRequest.builder()
-    .uri("file://content/C:/example/file.txt")
-    .build();
-
-ReadResourceResult result = client.readResource(request);
-String content = result.getContent();
-String mimeType = result.getMimeType();
-```
-
-## Implementation Details
-
-The resources are implemented using the MCP SDK's resource specification pattern. The server registers resource handlers for the URI patterns and delegates the handling of requests to the appropriate resource handler.
-
-The implementation uses Java's NIO.2 API for file operations, which provides a rich set of functionality for working with files and directories.
+Please refer to the [tools documentation](tools.md) for details on how to use these tools.

@@ -1,11 +1,14 @@
 package user.jakecarr;
 
+import user.jakecarr.resources.DirectoryListingResource;
 import user.jakecarr.resources.FileContentResource;
 import user.jakecarr.resources.FileMetadataResource;
 import user.jakecarr.util.FileSystemUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -21,16 +24,38 @@ public class FileSystemServer {
     
     private final FileContentResource contentResource;
     private final FileMetadataResource metadataResource;
-    private final FileSystemUtils fileSystemUtils;
+    private final DirectoryListingResource directoryListingResource;
     
     /**
      * Constructs a new FileSystemServer with the necessary resources.
+     * 
+     * @param contentResource The FileContentResource dependency
+     * @param metadataResource The FileMetadataResource dependency
+     * @param directoryListingResource The DirectoryListingResource dependency
      */
-    public FileSystemServer() {
-        this.fileSystemUtils = null; // FileSystemUtils has static methods only
-        this.contentResource = new FileContentResource();
-        this.metadataResource = new FileMetadataResource();
-        logger.info("FileSystemServer initialized");
+    public FileSystemServer(FileContentResource contentResource, 
+                           FileMetadataResource metadataResource,
+                           DirectoryListingResource directoryListingResource) {
+        this.contentResource = contentResource;
+        this.metadataResource = metadataResource;
+        this.directoryListingResource = directoryListingResource;
+        logger.debug("FileSystemServer constructed");
+    }
+    
+    /**
+     * Initialization method called by Spring after dependency injection.
+     */
+    @PostConstruct
+    public void initialize() {
+        logger.info("Initializing FileSystemServer");
+    }
+    
+    /**
+     * Cleanup method called by Spring before bean destruction.
+     */
+    @PreDestroy
+    public void cleanup() {
+        logger.info("Cleaning up FileSystemServer");
     }
     
     /**
@@ -52,12 +77,24 @@ public class FileSystemServer {
     }
     
     /**
-     * Gets the file system utilities.
+     * Gets the directory listing resource.
      * 
-     * @return the file system utilities
+     * @return the directory listing resource
      */
+    public DirectoryListingResource getDirectoryListingResource() {
+        return directoryListingResource;
+    }
+    
+    /**
+     * This method is deprecated and will be removed in a future version.
+     * FileSystemUtils is now injected directly where needed.
+     * 
+     * @return null
+     * @deprecated Use dependency injection to get FileSystemUtils
+     */
+    @Deprecated
     public FileSystemUtils getFileSystemUtils() {
-        return fileSystemUtils;
+        return null;
     }
     
     /**

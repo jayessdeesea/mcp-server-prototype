@@ -1,5 +1,6 @@
 package user.jakecarr.util;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.io.TempDir;
@@ -21,6 +22,13 @@ public class FileSystemUtilsTest {
 
     @TempDir
     Path tempDir;
+    
+    private FileSystemUtils fileSystemUtils;
+    
+    @BeforeEach
+    public void setUp() {
+        fileSystemUtils = new FileSystemUtils();
+    }
 
     @Test
     @Timeout(5) // 5 seconds timeout
@@ -31,7 +39,7 @@ public class FileSystemUtilsTest {
         Files.writeString(testFile, testContent);
 
         // Get metadata
-        FileMetadata metadata = FileSystemUtils.getFileMetadata(testFile.toString());
+        FileMetadata metadata = fileSystemUtils.getFileMetadata(testFile.toString());
 
         // Verify metadata
         assertNotNull(metadata, "Metadata should not be null");
@@ -55,7 +63,7 @@ public class FileSystemUtilsTest {
         Files.createDirectory(testDir);
 
         // Get metadata
-        FileMetadata metadata = FileSystemUtils.getFileMetadata(testDir.toString());
+        FileMetadata metadata = fileSystemUtils.getFileMetadata(testDir.toString());
 
         // Verify metadata
         assertNotNull(metadata, "Metadata should not be null");
@@ -76,7 +84,7 @@ public class FileSystemUtilsTest {
 
         // Expect an exception
         Exception exception = assertThrows(IOException.class, () -> {
-            FileSystemUtils.getFileMetadata(nonExistentPath);
+            fileSystemUtils.getFileMetadata(nonExistentPath);
         });
 
         // Verify the exception message
@@ -99,7 +107,7 @@ public class FileSystemUtilsTest {
         Files.writeString(subFile, "Subfile content");
 
         // List files non-recursively
-        List<FileMetadata> nonRecursiveFiles = FileSystemUtils.listFiles(tempDir.toString(), false);
+        List<FileMetadata> nonRecursiveFiles = fileSystemUtils.listFiles(tempDir.toString(), false);
 
         // Verify non-recursive listing
         assertNotNull(nonRecursiveFiles, "File list should not be null");
@@ -111,7 +119,7 @@ public class FileSystemUtilsTest {
         assertFalse(foundSubfile, "Subfile should not be included in non-recursive listing");
 
         // List files recursively
-        List<FileMetadata> recursiveFiles = FileSystemUtils.listFiles(tempDir.toString(), true);
+        List<FileMetadata> recursiveFiles = fileSystemUtils.listFiles(tempDir.toString(), true);
 
         // Verify recursive listing
         assertNotNull(recursiveFiles, "File list should not be null");
@@ -131,7 +139,7 @@ public class FileSystemUtilsTest {
 
         // Expect an exception
         Exception exception = assertThrows(IOException.class, () -> {
-            FileSystemUtils.listFiles(nonExistentPath, false);
+            fileSystemUtils.listFiles(nonExistentPath, false);
         });
 
         // Verify the exception message
@@ -148,7 +156,7 @@ public class FileSystemUtilsTest {
 
         // Try to list files in a file (not a directory)
         Exception exception = assertThrows(IOException.class, () -> {
-            FileSystemUtils.listFiles(testFile.toString(), false);
+            fileSystemUtils.listFiles(testFile.toString(), false);
         });
 
         // Verify the exception message
@@ -165,7 +173,7 @@ public class FileSystemUtilsTest {
         Files.writeString(testFile, testContent);
 
         // Read the file
-        String content = FileSystemUtils.readTextFile(testFile.toString());
+        String content = fileSystemUtils.readTextFile(testFile.toString());
 
         // Verify the content
         assertEquals(testContent, content, "File content should match");
@@ -179,7 +187,7 @@ public class FileSystemUtilsTest {
 
         // Expect an exception
         Exception exception = assertThrows(IOException.class, () -> {
-            FileSystemUtils.readTextFile(nonExistentPath);
+            fileSystemUtils.readTextFile(nonExistentPath);
         });
 
         // Verify the exception message
@@ -196,7 +204,7 @@ public class FileSystemUtilsTest {
 
         // Try to read a directory as a text file
         Exception exception = assertThrows(IOException.class, () -> {
-            FileSystemUtils.readTextFile(testDir.toString());
+            fileSystemUtils.readTextFile(testDir.toString());
         });
 
         // Verify the exception message
@@ -213,7 +221,7 @@ public class FileSystemUtilsTest {
         Files.write(testFile, testContent);
 
         // Read the file
-        String base64Content = FileSystemUtils.readBinaryFile(testFile.toString());
+        String base64Content = fileSystemUtils.readBinaryFile(testFile.toString());
 
         // Decode and verify the content
         byte[] decodedContent = Base64.getDecoder().decode(base64Content);
@@ -234,9 +242,9 @@ public class FileSystemUtilsTest {
         Files.write(binaryFile, binaryContent);
 
         // Test text file detection
-        assertTrue(FileSystemUtils.isTextFile(textFile.toString()), 
+        assertTrue(fileSystemUtils.isTextFile(textFile.toString()), 
                 "Text file should be detected as text");
-        assertFalse(FileSystemUtils.isTextFile(binaryFile.toString()), 
+        assertFalse(fileSystemUtils.isTextFile(binaryFile.toString()), 
                 "Binary file should not be detected as text");
     }
 
@@ -252,9 +260,9 @@ public class FileSystemUtilsTest {
         String contentPrefix = "file://content/";
 
         // Extract paths
-        String metadataPath = FileSystemUtils.extractPathFromUri(metadataUri, metadataPrefix);
-        String contentPath = FileSystemUtils.extractPathFromUri(contentUri, contentPrefix);
-        String encodedPath = FileSystemUtils.extractPathFromUri(encodedUri, metadataPrefix);
+        String metadataPath = fileSystemUtils.extractPathFromUri(metadataUri, metadataPrefix);
+        String contentPath = fileSystemUtils.extractPathFromUri(contentUri, contentPrefix);
+        String encodedPath = fileSystemUtils.extractPathFromUri(encodedUri, metadataPrefix);
 
         // Verify extracted paths
         assertEquals("C:/path/to/file.txt", metadataPath, "Extracted metadata path should match");
@@ -271,7 +279,7 @@ public class FileSystemUtilsTest {
 
         // Expect an exception
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            FileSystemUtils.extractPathFromUri(invalidUri, prefix);
+            fileSystemUtils.extractPathFromUri(invalidUri, prefix);
         });
 
         // Verify the exception message
